@@ -50,7 +50,7 @@ resource "aws_iam_role_policy_attachment" "glue_service" {
 }
 
 resource "aws_iam_role" "glue_service_role" {
-    name = "etl-glue-role"
+    name = "glue-service-role"
 
     assume_role_policy = jsonencode({
     "Version": "2012-10-17",
