@@ -1,4 +1,21 @@
-# Ignore local terraform directories
+# Terraform
 .terraform/
 *.tfstate
+*.tfstate.backup
 *.tfvars
+.terraform.lock.hcl
+
+# Python
+venv/
+__pycache__/
+*.py[cod]
+
+# Generated Files
+*.zip
+*.csv
+lambda_function_payload.zip
+
+# IDE
+.vscode/
+.idea/
+.DS_Store
