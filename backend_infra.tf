@@ -2,8 +2,8 @@
 
 # 1. The S3 Bucket
 resource "aws_s3_bucket" "terraform_state" {
-  bucket = "papas412-tf-state-2026" 
-  
+  bucket = "papas412-tf-state-2026"
+
   lifecycle {
     prevent_destroy = true # Protects your state from accidental deletion
   }

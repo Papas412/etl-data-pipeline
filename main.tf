@@ -1,73 +1,73 @@
 resource "aws_s3_bucket" "data_bucket-raw-papas412" {
-    bucket = var.raw_bucket_name
+  bucket = var.raw_bucket_name
 
-    tags = var.project_tags
+  tags = var.project_tags
 }
 
 resource "aws_s3_bucket" "data_bucket-processed-papas412" {
-    bucket = var.processed_bucket_name
+  bucket = var.processed_bucket_name
 
-    tags = var.project_tags
+  tags = var.project_tags
 }
 
 resource "aws_s3_bucket" "data_bucket-final-papas412" {
-    bucket = var.final_bucket_name
+  bucket = var.final_bucket_name
 
-    tags = var.project_tags
+  tags = var.project_tags
 }
 
 resource "aws_iam_role" "etl_lambda_role" {
-    name = "etl-lambda-role"
+  name = "etl-lambda-role"
 
-    assume_role_policy = jsonencode({
-        Version = "2012-10-17"
-        Statement = [
-            {
-                Action = "sts:AssumeRole"
-                Effect = "Allow"
-                Principal = {
-                    Service = "lambda.amazonaws.com"
-                }
-            }
-        ]
-    })
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      }
+    ]
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "s3_full_access" {
-    role = aws_iam_role.etl_lambda_role.name
-    policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+  role       = aws_iam_role.etl_lambda_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
 }
 
 resource "aws_iam_role_policy_attachment" "glue_service" {
-    role = aws_iam_role.etl_lambda_role.name
-    policy_arn = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
+  role       = aws_iam_role.etl_lambda_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
 }
 
 resource "aws_iam_role" "glue_service_role" {
-    name = "glue-service-role"
+  name = "glue-service-role"
 
-    assume_role_policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Principal": {
-                "Service": "glue.amazonaws.com"
-            },
-            "Action": "sts:AssumeRole"
-        }
+  assume_role_policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" : "glue.amazonaws.com"
+        },
+        "Action" : "sts:AssumeRole"
+      }
     ]
-})
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "glue-svc" {
-    role = aws_iam_role.glue_service_role.name
-    policy_arn = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
+  role       = aws_iam_role.glue_service_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
 }
 
 resource "aws_iam_role_policy_attachment" "glue-svc-s3" {
-    role = aws_iam_role.glue_service_role.name
-    policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+  role       = aws_iam_role.glue_service_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
 }
 
 data "archive_file" "lambda_zip" {
@@ -104,10 +104,10 @@ resource "aws_lambda_function" "csv-preprocessor-lambda" {
   filename      = data.archive_file.lambda_zip.output_path
   function_name = "etl-lambda"
   role          = aws_iam_role.etl_lambda_role.arn
-  
+
   # "lambda.handler" means: look in lambda.py for a function named def handler()
-  handler       = "lambda.lambda_handler" 
-  runtime       = "python3.9"
+  handler = "lambda.lambda_handler"
+  runtime = "python3.9"
 
   environment {
     variables = {

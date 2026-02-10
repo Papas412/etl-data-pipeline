@@ -31,7 +31,7 @@ variable "glue_db_name" {
 variable "project_tags" {
   description = "Common tags for all resources"
   type        = map(string)
-  default     = {
+  default = {
     Project = "ETL-Pipeline"
     Owner   = "papas412"
   }

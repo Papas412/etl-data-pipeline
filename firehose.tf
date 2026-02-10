@@ -5,16 +5,16 @@ resource "aws_glue_catalog_database" "etl_db" {
 resource "aws_glue_catalog_table" "weather_data" {
   database_name = aws_glue_catalog_database.etl_db.name
   name          = "weather_data_parquet"
-  
+
   table_type = "EXTERNAL_TABLE"
 
   parameters = {
-    EXTERNAL = "TRUE"
+    EXTERNAL              = "TRUE"
     "parquet.compression" = "SNAPPY"
   }
 
   storage_descriptor {
-    location = "s3://${aws_s3_bucket.data_bucket-final-papas412.bucket}/parquet-data/"
+    location      = "s3://${aws_s3_bucket.data_bucket-final-papas412.bucket}/parquet-data/"
     input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
     output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
 
@@ -179,8 +179,8 @@ resource "aws_iam_role" "firehose_role" {
 }
 
 resource "aws_iam_role_policy" "firehose_s3_glue_policy" {
-  name   = "firehose_s3_glue_policy"
-  role   = aws_iam_role.firehose_role.id
+  name = "firehose_s3_glue_policy"
+  role = aws_iam_role.firehose_role.id
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -213,13 +213,13 @@ resource "aws_iam_role_policy" "firehose_s3_glue_policy" {
         ]
       },
       {
-          Effect = "Allow",
-          Action = [
-              "logs:PutLogEvents"
-          ],
-          Resource = [
-              "arn:aws:logs:*:*:log-group:/aws/kinesisfirehose/*"
-          ]
+        Effect = "Allow",
+        Action = [
+          "logs:PutLogEvents"
+        ],
+        Resource = [
+          "arn:aws:logs:*:*:log-group:/aws/kinesisfirehose/*"
+        ]
       }
     ]
   })
@@ -232,7 +232,7 @@ resource "aws_kinesis_firehose_delivery_stream" "weather_stream" {
   extended_s3_configuration {
     role_arn   = aws_iam_role.firehose_role.arn
     bucket_arn = aws_s3_bucket.data_bucket-final-papas412.arn
-    
+
     # Required for data format conversion (min 64MB)
     buffer_size     = 128
     buffer_interval = 300
